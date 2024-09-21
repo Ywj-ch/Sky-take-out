@@ -23,6 +23,7 @@ spring:
       remove-abandoned-timeout-millis: 1800 # 自动回收超时连接的等待时间
       validation-query: select 1
       test-on-borrow: false
+      async-init: true
 
 mybatis:
   #mapper配置文件

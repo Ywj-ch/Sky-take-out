@@ -19,6 +19,8 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -30,6 +32,7 @@ public class DishserviceImpl implements Dishservice {
     private DishFlavorMapper dishFlavorMapper;
     @Autowired
     private SetmealDishMapper setmealDishMapper;
+
     /**
      * 新增菜品
      * @param dishDTO
@@ -92,21 +95,68 @@ public class DishserviceImpl implements Dishservice {
             //当前菜品被套餐关联了，不能删除
             throw new DeletionNotAllowedException(MessageConstant.DISH_BE_RELATED_BY_SETMEAL);
         }
-        //删除菜品表中的菜品数据
-        for (Long id : ids) {
-            dishMapper.deleteById(id);
-            //删除口味数据
-            dishFlavorMapper.deleteByDishId(id);
+        //批量删除菜品表中的菜品数据
+        dishMapper.deleteByIds(ids);
+        //批量删除口味数据
+        dishFlavorMapper.deleteByDishIds(ids);
+
+    }
+
+    /**
+     * 根据id查询菜品
+     */
+    @Override
+    public DishVO getByIdWithFlavor(Long id) {
+        //根据id查询菜品数据
+        Dish dish = dishMapper.getById(id);
+        //根据id查询菜品口味数据
+        List<DishFlavor> dishFlavors = dishFlavorMapper.getByDishId(id);
+        DishVO dishVO = new DishVO();
+        BeanUtils.copyProperties(dish,dishVO);
+        dishVO.setFlavors(dishFlavors);
+        return dishVO;
+    }
+
+    /**
+     * 根据id修改菜品基本信息和对应的口味信息
+     * @param dishDTO
+     */
+    @Override
+    public void updateWithFlavor(DishDTO dishDTO) {
+        //先将前端传来的数据拷贝到实体层
+        Dish dish = new Dish();
+        BeanUtils.copyProperties(dishDTO, dish);
+        //修改菜品的基本信息
+        dishMapper.update(dish);
+        //删除掉原来的口味数据
+        dishFlavorMapper.deleteByDishIds(Collections.singletonList(dishDTO.getId()));
+        //重新添加口味数据
+        List<DishFlavor> dishFlavorList = dishDTO.getFlavors();
+        if (dishFlavorList != null && !dishFlavorList.isEmpty()) {
+            dishFlavorList.forEach(dishFlavor -> {
+                dishFlavor.setDishId(dishDTO.getId());
+            });
+            //向菜品口味关系表插入一条或者多条数据
+            dishFlavorMapper.insert(dishFlavorList);
         }
+
+
+    }
+
+    /**
+     * 菜品起售停售
+     * @param status
+     * @param id
+     */
+    @Override
+    public void status(Integer status, Long id) {
+
     }
 
 
-
-
-
-
-
-
-
-
 }
+
+
+
+
+
