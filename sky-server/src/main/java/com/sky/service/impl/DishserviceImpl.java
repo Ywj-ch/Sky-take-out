@@ -139,8 +139,6 @@ public class DishserviceImpl implements Dishservice {
             //向菜品口味关系表插入一条或者多条数据
             dishFlavorMapper.insert(dishFlavorList);
         }
-
-
     }
 
     /**
@@ -151,6 +149,21 @@ public class DishserviceImpl implements Dishservice {
     @Override
     public void status(Integer status, Long id) {
 
+    }
+
+    /**
+     * 根据分类id查询菜品
+     * @param categoryId
+     * @return
+     */
+    @Override
+    public List<Dish> list(long categoryId) {
+        //初始化一下dish
+        Dish dish = Dish.builder()
+                .categoryId(categoryId)
+                .status(StatusConstant.ENABLE)
+                .build();
+        return dishMapper.list(dish);
     }
 
 
