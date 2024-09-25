@@ -45,7 +45,7 @@ public interface DishMapper {
     void deleteByIds(List<Long> ids);
 
     /**
-     * 根据id获取菜品
+     * 根据菜品id获取菜品
      * @param id
      * @return
      */
@@ -53,7 +53,7 @@ public interface DishMapper {
     Dish getById(Long id);
 
     /**
-     * 根据id动态修改菜品
+     * 根据菜品id动态修改菜品
      * @param dish
      */
     @AutoFill(value=OperationType.UPDATE)
@@ -65,5 +65,13 @@ public interface DishMapper {
      * @return
      */
     List<Dish> list(Dish dish);
+
+    /**
+     * 根据 **套餐** id获取菜品集合
+     * @param id
+     * @return
+     */
+    List<Dish> getBySetmealId(Long id);
+
 
 }

@@ -23,6 +23,10 @@
         where id = #{id}
     </update>
 
+    <update id="status">
+
+    </update>
+
     <delete id="deleteByIds">
         delete from dish where id in
         <foreach collection="ids" item="id" separator="," open="(" close=")">
@@ -54,6 +58,10 @@
             </if>
         </where>
         order by create_time Desc
+    </select>
+
+    <select id="getBySetmealId" resultType="com.sky.entity.Dish">
+        select d.* from dish d left join setmeal_dish s on d.id = s.dish_id where setmeal_id = #{id}
     </select>
 
 
